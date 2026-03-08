@@ -137,10 +137,12 @@ jobs:
             ${{ inputs.COMMON_TREE_URL }} \
             workspace/${{ inputs.COMMON_PATH }}
 
-      - name: Fix missing MediaTek sepolicy
+      - name: Fix missing vendor stubs
         run: |
           mkdir -p workspace/device/mediatek/sepolicy_vndr
           touch workspace/device/mediatek/sepolicy_vndr/SEPolicy.mk
+          mkdir -p workspace/vendor/xiaomi/mt6768-common
+          touch workspace/vendor/xiaomi/mt6768-common/BoardConfigVendor.mk
 
       - name: Clone kernel tree
         run: |
