@@ -147,6 +147,14 @@ jobs:
           mkdir -p workspace/vendor/xiaomi/lancelot
           touch workspace/vendor/xiaomi/lancelot/BoardConfigVendor.mk
           touch workspace/vendor/xiaomi/lancelot/lancelot-vendor.mk
+          mkdir -p workspace/vendor/mediatek
+          touch workspace/vendor/mediatek/BoardConfigVendor.mk
+          mkdir -p workspace/hardware/mediatek
+          mkdir -p workspace/hardware/xiaomi
+          mkdir -p workspace/hardware/google/interfaces
+          mkdir -p workspace/hardware/google/pixel
+          mkdir -p workspace/hardware/lineage/interfaces/power-libperfmgr
+          mkdir -p workspace/vendor/fingerprint/opensource/interfaces
           
       - name: Clone kernel tree
         run: |
