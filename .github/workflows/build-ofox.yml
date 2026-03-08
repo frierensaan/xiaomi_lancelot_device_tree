@@ -145,15 +145,10 @@ jobs:
             workspace/kernel/xiaomi/mt6768
 
       - name: Build OrangeFox
+        shell: bash
         run: |
           cd workspace
-          set +e
-          source build/envsetup.sh
-          if [ $? -ne 0 ]; then
-            echo "ERROR: build/envsetup.sh failed"
-            ls -la
-            exit 1
-          fi
+          source build/envsetup.sh 2>&1 || { echo "ENVSETUP FAILED"; exit 1; }
 
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=${{ inputs.DEVICE_NAME }}
@@ -174,12 +169,7 @@ jobs:
           export CCACHE_EXEC=$(which ccache)
           export LC_ALL=C
 
-          lunch ${{ inputs.MAKEFILE_NAME }}-eng
-          if [ $? -ne 0 ]; then
-            echo "ERROR: lunch failed"
-            exit 1
-          fi
-
+          lunch ${{ inputs.MAKEFILE_NAME }}-eng 2>&1 || { echo "LUNCH FAILED"; exit 1; }
           mka ${{ inputs.BUILD_TARGET }} -j$(nproc --all) 2>&1 | tee build.log
           exit ${PIPESTATUS[0]}
 
