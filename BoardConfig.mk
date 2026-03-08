@@ -23,9 +23,10 @@ ODM_MANIFEST_GALAHAD_FILES := $(DEVICE_PATH)/manifest_galahad.xml
 
 # Kernel
 TARGET_KERNEL_CONFIG := lancelot_defconfig
+TARGET_KERNEL_SOURCE := kernel/xiaomi/mt6768
 
-# Inherit the proprietary files
-include vendor/xiaomi/lancelot/BoardConfigVendor.mk
+# Vendor proprietary files - not needed for recovery build
+# include vendor/xiaomi/lancelot/BoardConfigVendor.mk
 
 # ── ORANGEFOX / TWRP UI ──────────────────────────────────────────────────────
 TW_THEME := portrait_hdpi
