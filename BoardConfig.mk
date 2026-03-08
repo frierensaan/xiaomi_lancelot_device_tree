@@ -55,9 +55,6 @@ BOARD_MAIN_PARTITION_LIST := product vendor system
 BOARD_USES_METADATA_PARTITION := true
 BOARD_FLASH_BLOCK_SIZE := 131072
 
-# Dynamic partitions
-PRODUCT_USE_DYNAMIC_PARTITIONS := true
-
 # Kernel
 TARGET_KERNEL_CONFIG := lancelot_defconfig
 TARGET_KERNEL_SOURCE := kernel/xiaomi/mt6768
