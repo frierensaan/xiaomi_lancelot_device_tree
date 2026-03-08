@@ -6,7 +6,7 @@ on:
       MANIFEST_BRANCH:
         description: 'OrangeFox Manifest Branch'
         required: true
-        default: 'fox_12.1'
+        default: '12.1'
       DEVICE_TREE_URL:
         description: 'Device Tree URL'
         required: true
@@ -19,6 +19,18 @@ on:
         description: 'Device Path'
         required: true
         default: 'device/xiaomi/lancelot'
+      COMMON_TREE_URL:
+        description: 'Common Tree URL'
+        required: true
+        default: 'https://github.com/Jbub5/device_xiaomi_mt6768-common'
+      COMMON_TREE_BRANCH:
+        description: 'Common Tree Branch'
+        required: true
+        default: '14'
+      COMMON_PATH:
+        description: 'Common Tree Path'
+        required: true
+        default: 'device/xiaomi/mt6768-common'
       KERNEL_TREE_URL:
         description: 'Kernel Tree URL'
         required: true
@@ -99,8 +111,9 @@ jobs:
           mkdir workspace && cd workspace
           git clone https://gitlab.com/OrangeFox/sync.git ofox_sync
           cd ofox_sync
-          bash orangefox_sync.sh --branch 12.1 --path $(pwd)/../../workspace
-          cd ../..
+          bash orangefox_sync.sh --branch ${{ inputs.MANIFEST_BRANCH }} --path $(pwd)/..
+          cd ..
+          rm -rf ofox_sync
 
       - name: Clone device tree
         run: |
@@ -109,7 +122,12 @@ jobs:
             ${{ inputs.DEVICE_TREE_URL }} \
             workspace/${{ inputs.DEVICE_PATH }}
 
-      
+      - name: Clone common tree
+        run: |
+          git clone --depth=1 \
+            -b ${{ inputs.COMMON_TREE_BRANCH }} \
+            ${{ inputs.COMMON_TREE_URL }} \
+            workspace/${{ inputs.COMMON_PATH }}
 
       - name: Clone kernel tree
         run: |
@@ -123,7 +141,6 @@ jobs:
           cd workspace
           source build/envsetup.sh
 
-          # OrangeFox flags
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=${{ inputs.DEVICE_NAME }}
           export OF_MAINTAINER="frieren"
@@ -185,7 +202,7 @@ jobs:
             **Device:** Xiaomi Redmi 9 (lancelot)
             **Chipset:** MediaTek MT6768
             **Target ROM:** Voltage OS 5.3 QPR1
-            **Manifest:** fox_14.1
+            **Manifest:** fox_12.1
             **Maintainer:** frieren
 
             > ⚠️ Unofficial build — flash at your own risk.
