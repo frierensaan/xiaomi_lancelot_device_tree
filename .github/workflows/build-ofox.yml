@@ -19,18 +19,6 @@ on:
         description: 'Device Path'
         required: true
         default: 'device/xiaomi/lancelot'
-      COMMON_TREE_URL:
-        description: 'Common Tree URL'
-        required: true
-        default: 'https://github.com/Jbub5/device_xiaomi_mt6768-common'
-      COMMON_TREE_BRANCH:
-        description: 'Common Tree Branch'
-        required: true
-        default: '14'
-      COMMON_PATH:
-        description: 'Common Tree Path'
-        required: true
-        default: 'device/xiaomi/mt6768-common'
       KERNEL_TREE_URL:
         description: 'Kernel Tree URL'
         required: true
@@ -115,14 +103,6 @@ jobs:
           cd ..
           rm -rf ofox_sync
 
-      - name: Debug workspace structure
-        run: |
-          echo "=== workspace root ==="
-          ls workspace/
-          echo "=== checking for envsetup ==="
-          find workspace -name "envsetup.sh" 2>/dev/null
-          find . -name "envsetup.sh" 2>/dev/null
-
       - name: Clone device tree
         run: |
           git clone --depth=1 \
@@ -130,32 +110,6 @@ jobs:
             ${{ inputs.DEVICE_TREE_URL }} \
             workspace/${{ inputs.DEVICE_PATH }}
 
-      - name: Clone common tree
-        run: |
-          git clone --depth=1 \
-            -b ${{ inputs.COMMON_TREE_BRANCH }} \
-            ${{ inputs.COMMON_TREE_URL }} \
-            workspace/${{ inputs.COMMON_PATH }}
-
-      - name: Fix missing vendor stubs
-        run: |
-          mkdir -p workspace/device/mediatek/sepolicy_vndr
-          touch workspace/device/mediatek/sepolicy_vndr/SEPolicy.mk
-          mkdir -p workspace/vendor/xiaomi/mt6768-common
-          touch workspace/vendor/xiaomi/mt6768-common/BoardConfigVendor.mk
-          touch workspace/vendor/xiaomi/mt6768-common/mt6768-common-vendor.mk
-          mkdir -p workspace/vendor/xiaomi/lancelot
-          touch workspace/vendor/xiaomi/lancelot/BoardConfigVendor.mk
-          touch workspace/vendor/xiaomi/lancelot/lancelot-vendor.mk
-          mkdir -p workspace/vendor/mediatek
-          touch workspace/vendor/mediatek/BoardConfigVendor.mk
-          mkdir -p workspace/hardware/mediatek
-          mkdir -p workspace/hardware/xiaomi
-          mkdir -p workspace/hardware/google/interfaces
-          mkdir -p workspace/hardware/google/pixel
-          mkdir -p workspace/hardware/lineage/interfaces/power-libperfmgr
-          mkdir -p workspace/vendor/fingerprint/opensource/interfaces
-          
       - name: Clone kernel tree
         run: |
           git clone --depth=1 \
@@ -190,6 +144,7 @@ jobs:
           set -e
           lunch ${{ inputs.MAKEFILE_NAME }}-eng && mka adbd ${{ inputs.BUILD_TARGET }} -j$(nproc --all) 2>&1 | tee build.log
           exit ${PIPESTATUS[0]}
+
       - name: Check build output
         run: |
           OUT="workspace/out/target/product/${{ inputs.DEVICE_NAME }}"
