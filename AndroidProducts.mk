@@ -1,13 +1,11 @@
 #
-# Copyright (C) 2022 The LineageOS Project
+# Copyright (C) 2024 The OrangeFox Recovery Project
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_lancelot.mk
+    $(LOCAL_DIR)/twrp_lancelot.mk
 
 COMMON_LUNCH_CHOICES := \
-    lineage_lancelot-user \
-    lineage_lancelot-userdebug \
-    lineage_lancelot-eng
+    twrp_lancelot-eng
