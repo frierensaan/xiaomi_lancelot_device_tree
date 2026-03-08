@@ -56,10 +56,9 @@ BOARD_USES_METADATA_PARTITION := true
 BOARD_FLASH_BLOCK_SIZE := 131072
 
 # Dynamic partitions
-BOARD_SUPER_PARTITION_SIZE := 6012043264
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
-# Kernel - built from source
+# Kernel
 TARGET_KERNEL_CONFIG := lancelot_defconfig
 TARGET_KERNEL_SOURCE := kernel/xiaomi/mt6768
 BOARD_KERNEL_IMAGE_NAME := Image.gz
@@ -83,7 +82,7 @@ BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 TARGET_BOARD_PLATFORM := mt6768
 TARGET_BOOTLOADER_BOARD_NAME := mt6768
 
-# Hack: prevent anti rollback
+# Security patch
 PLATFORM_SECURITY_PATCH := 2099-12-31
 VENDOR_SECURITY_PATCH := 2099-12-31
 PLATFORM_VERSION := 16.1.0
@@ -96,7 +95,6 @@ TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
 TW_USE_FSCRYPT_POLICY := 2
-TW_INCLUDE_FBE_METADATA_DECRYPT := true
 
 # Beanpod TEE + KeyMint libs
 TARGET_RECOVERY_DEVICE_MODULES += \
@@ -164,16 +162,3 @@ OF_STATUS_H := 80
 BOARD_SEPOLICY_VERS := 29.0.3
 SEPOLICY_IGNORE_NEVERALLOWS := true
 SELINUX_IGNORE_NEVERALLOWS := true
-```
-
-Notice **no common tree include at all**. Now we also need to:
-
-1. **Remove the common tree clone** from the workflow
-2. **Create `recovery.fstab`** in the device tree root
-
-For the fstab, create a new file called `recovery.fstab` in the root of your device tree with this content:
-```
-# Android fstab file.
-/dev/block/platform/bootdevice/by-name/userdata      /data       f2fs    noatime,nosuid,nodev,discard,noflush_merge,inlinecrypt    wait,check,formattable,quota,latemount,reservedsize=128m,checkpoint=fs,fileencryption=aes-256-xts:aes-256-cts:v2+emmc_optimized,keydirectory=/metadata/vold/metadata_encryption
-/dev/block/platform/bootdevice/by-name/md_udc        /metadata   ext4    noatime,nosuid,nodev,discard                              wait,check,formattable,first_stage_mount
-/dev/block/platform/bootdevice/by-name/cache         /cache      ext4    noatime,nosuid,nodev,noauto_da_alloc,discard              wait,check,formattable
