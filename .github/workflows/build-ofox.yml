@@ -6,7 +6,7 @@ on:
       MANIFEST_BRANCH:
         description: 'OrangeFox Manifest Branch'
         required: true
-        default: 'fox_14.1'
+        default: 'fox_12.1'
       DEVICE_TREE_URL:
         description: 'Device Tree URL'
         required: true
@@ -106,23 +106,13 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      - name: Initialise OrangeFox source
-        run: |
-          mkdir workspace && cd workspace
-          repo init --depth=1 \
-            -u https://gitlab.com/OrangeFox/sync.git \
-            -b ${{ inputs.MANIFEST_BRANCH }}
-
       - name: Sync OrangeFox source
         run: |
-          cd workspace
-          repo sync -c \
-            --no-clone-bundle \
-            --no-tags \
-            --force-sync \
-            --optimized-fetch \
-            --prune \
-            -j$(nproc --all)
+          mkdir workspace && cd workspace
+          git clone https://gitlab.com/OrangeFox/sync.git ofox_sync
+          cd ofox_sync
+          bash orangefox_sync.sh --branch 12.1 --path $(pwd)/../../workspace
+          cd ../..
 
       - name: Clone device tree
         run: |
