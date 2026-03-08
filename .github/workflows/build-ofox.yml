@@ -108,10 +108,10 @@ jobs:
 
       - name: Sync OrangeFox source
         run: |
-          mkdir workspace && cd workspace
+          mkdir workspace
           git clone https://gitlab.com/OrangeFox/sync.git ofox_sync
           cd ofox_sync
-          bash orangefox_sync.sh --branch ${{ inputs.MANIFEST_BRANCH }} --path $(pwd)/..
+          bash orangefox_sync.sh --branch ${{ inputs.MANIFEST_BRANCH }} --path $(pwd)/../workspace
           cd ..
           rm -rf ofox_sync
 
