@@ -134,7 +134,7 @@ jobs:
           export OF_DISABLE_MIUI_OTA_BY_DEFAULT=1
           export OF_SUPPORT_ALL_BLOCK_OTA_UPDATES=1
           export FOX_BUILD_TYPE="Unofficial"
-          export OF_VANILLA_BUILD=1
+          export FOX_VANILLA_BUILD=1
           export OF_SCREEN_H=2340
           export OF_STATUS_H=80
           export OF_FORCE_USE_RECOVERY_FSTAB=0
