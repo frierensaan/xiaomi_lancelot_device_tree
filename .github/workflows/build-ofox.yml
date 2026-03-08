@@ -1,0 +1,223 @@
+name: Build OrangeFox Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      MANIFEST_BRANCH:
+        description: 'OrangeFox Manifest Branch'
+        required: true
+        default: 'fox_14.1'
+      DEVICE_TREE_URL:
+        description: 'Device Tree URL'
+        required: true
+        default: 'https://github.com/frieren/android_device_xiaomi_lancelot'
+      DEVICE_TREE_BRANCH:
+        description: 'Device Tree Branch'
+        required: true
+        default: 'fox_14.1'
+      DEVICE_PATH:
+        description: 'Device Path'
+        required: true
+        default: 'device/xiaomi/lancelot'
+      COMMON_TREE_URL:
+        description: 'Common Tree URL'
+        required: true
+        default: 'https://github.com/Jbub5/device_xiaomi_mt6768-common'
+      COMMON_TREE_BRANCH:
+        description: 'Common Tree Branch'
+        required: true
+        default: 'main'
+      COMMON_PATH:
+        description: 'Common Tree Path'
+        required: true
+        default: 'device/xiaomi/mt6768-common'
+      KERNEL_TREE_URL:
+        description: 'Kernel Tree URL'
+        required: true
+        default: 'https://github.com/Jbub5/android_kernel_xiaomi_mt6768'
+      KERNEL_TREE_BRANCH:
+        description: 'Kernel Tree Branch'
+        required: true
+        default: 'main'
+      DEVICE_NAME:
+        description: 'Device Codename'
+        required: true
+        default: 'lancelot'
+      MAKEFILE_NAME:
+        description: 'Makefile Name'
+        required: true
+        default: 'twrp_lancelot'
+      BUILD_TARGET:
+        description: 'Build Target'
+        required: true
+        default: 'recoveryimage'
+
+jobs:
+  build:
+    name: Build OrangeFox
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 12
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison build-essential ccache curl flex \
+            g++-multilib gcc-multilib git git-lfs gnupg \
+            gperf imagemagick lib32ncurses5-dev lib32readline-dev \
+            lib32z1-dev libelf-dev liblz4-tool libncurses5 \
+            libncurses5-dev libsdl1.2-dev libssl-dev libxml2 \
+            libxml2-utils lzop pngcrush rsync schedtool \
+            squashfs-tools xsltproc zip zlib1g-dev \
+            python3 python-is-python3
+
+      - name: Setup ccache
+        run: |
+          ccache --max-size=10G
+          echo "USE_CCACHE=1" >> $GITHUB_ENV
+          echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ccache-ofox-lancelot-${{ github.sha }}
+          restore-keys: ccache-ofox-lancelot-
+
+      - name: Install repo tool
+        run: |
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Initialise OrangeFox source
+        run: |
+          mkdir workspace && cd workspace
+          repo init --depth=1 \
+            -u https://gitlab.com/OrangeFox/sync.git \
+            -b ${{ inputs.MANIFEST_BRANCH }}
+
+      - name: Sync OrangeFox source
+        run: |
+          cd workspace
+          repo sync -c \
+            --no-clone-bundle \
+            --no-tags \
+            --force-sync \
+            --optimized-fetch \
+            --prune \
+            -j$(nproc --all)
+
+      - name: Clone device tree
+        run: |
+          git clone --depth=1 \
+            -b ${{ inputs.DEVICE_TREE_BRANCH }} \
+            ${{ inputs.DEVICE_TREE_URL }} \
+            workspace/${{ inputs.DEVICE_PATH }}
+
+      - name: Clone common tree
+        run: |
+          git clone --depth=1 \
+            -b ${{ inputs.COMMON_TREE_BRANCH }} \
+            ${{ inputs.COMMON_TREE_URL }} \
+            workspace/${{ inputs.COMMON_PATH }}
+
+      - name: Clone kernel tree
+        run: |
+          git clone --depth=1 \
+            -b ${{ inputs.KERNEL_TREE_BRANCH }} \
+            ${{ inputs.KERNEL_TREE_URL }} \
+            workspace/kernel/xiaomi/mt6768
+
+      - name: Build OrangeFox
+        run: |
+          cd workspace
+          source build/envsetup.sh
+
+          # OrangeFox flags
+          export ALLOW_MISSING_DEPENDENCIES=true
+          export FOX_BUILD_DEVICE=${{ inputs.DEVICE_NAME }}
+          export OF_MAINTAINER="frieren"
+          export OF_USE_MAGISKBOOT=1
+          export OF_USE_MAGISKBOOT_FOR_ALL_PATCHES=1
+          export OF_USE_NEW_MAGISKBOOT=1
+          export OF_DEFAULT_KEYMASTER_VERSION=4.0
+          export OF_INCLUDE_FBE_METADATA_DECRYPT=1
+          export OF_DISABLE_MIUI_OTA_BY_DEFAULT=1
+          export OF_SUPPORT_ALL_BLOCK_OTA_UPDATES=1
+          export FOX_BUILD_TYPE="Unofficial"
+          export OF_VANILLA_BUILD=1
+          export OF_SCREEN_H=2340
+          export OF_STATUS_H=80
+          export OF_FORCE_USE_RECOVERY_FSTAB=0
+          export USE_CCACHE=1
+          export CCACHE_EXEC=$(which ccache)
+          export LC_ALL=C
+
+          lunch ${{ inputs.MAKEFILE_NAME }}-eng
+          mka ${{ inputs.BUILD_TARGET }} -j$(nproc --all) 2>&1 | tee build.log
+
+      - name: Check build output
+        run: |
+          OUT="workspace/out/target/product/${{ inputs.DEVICE_NAME }}"
+          if ls $OUT/OrangeFox*.zip 2>/dev/null || ls $OUT/recovery.img 2>/dev/null; then
+            echo "BUILD_SUCCESS=true" >> $GITHUB_ENV
+          else
+            echo "BUILD_SUCCESS=false" >> $GITHUB_ENV
+            echo "Build failed! Last 200 lines of log:"
+            tail -200 workspace/build.log
+            exit 1
+          fi
+
+      - name: Upload to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrangeFox-lancelot-${{ github.run_id }}
+          path: |
+            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/OrangeFox*.zip
+            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/recovery.img
+          retention-days: 7
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ github.run_id }}
+          path: workspace/build.log
+          retention-days: 3
+
+      - name: Create Release
+        if: env.BUILD_SUCCESS == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: OrangeFox-lancelot-${{ github.run_id }}
+          name: "OrangeFox | lancelot | Voltage OS A16 QPR1"
+          body: |
+            **Device:** Xiaomi Redmi 9 (lancelot)
+            **Chipset:** MediaTek MT6768
+            **Target ROM:** Voltage OS 5.3 QPR1
+            **Manifest:** fox_14.1
+            **Maintainer:** frieren
+
+            > ⚠️ Unofficial build — flash at your own risk.
+          files: |
+            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/OrangeFox*.zip
+            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/recovery.img
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
