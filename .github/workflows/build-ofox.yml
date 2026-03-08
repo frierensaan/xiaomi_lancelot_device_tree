@@ -115,6 +115,14 @@ jobs:
           cd ..
           rm -rf ofox_sync
 
+      - name: Debug workspace structure
+        run: |
+          echo "=== workspace root ==="
+          ls workspace/
+          echo "=== checking for envsetup ==="
+          find workspace -name "envsetup.sh" 2>/dev/null
+          find . -name "envsetup.sh" 2>/dev/null
+
       - name: Clone device tree
         run: |
           git clone --depth=1 \
