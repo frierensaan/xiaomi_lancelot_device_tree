@@ -10,7 +10,7 @@ on:
       DEVICE_TREE_URL:
         description: 'Device Tree URL'
         required: true
-        default: 'https://github.com/frieren/android_device_xiaomi_lancelot'
+        default: 'https://github.com/frierensaan/xiaomi_lancelot_device_tree'
       DEVICE_TREE_BRANCH:
         description: 'Device Tree Branch'
         required: true
