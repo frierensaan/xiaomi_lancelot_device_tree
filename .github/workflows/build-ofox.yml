@@ -137,6 +137,11 @@ jobs:
             ${{ inputs.COMMON_TREE_URL }} \
             workspace/${{ inputs.COMMON_PATH }}
 
+      - name: Fix missing MediaTek sepolicy
+        run: |
+          mkdir -p workspace/device/mediatek/sepolicy_vndr
+          touch workspace/device/mediatek/sepolicy_vndr/SEPolicy.mk
+
       - name: Clone kernel tree
         run: |
           git clone --depth=1 \
