@@ -19,18 +19,6 @@ on:
         description: 'Device Path'
         required: true
         default: 'device/xiaomi/lancelot'
-      COMMON_TREE_URL:
-        description: 'Common Tree URL'
-        required: true
-        default: 'https://github.com/Jbub5/device_xiaomi_mt6768-common'
-      COMMON_TREE_BRANCH:
-        description: 'Common Tree Branch'
-        required: true
-        default: 'main'
-      COMMON_PATH:
-        description: 'Common Tree Path'
-        required: true
-        default: 'device/xiaomi/mt6768-common'
       KERNEL_TREE_URL:
         description: 'Kernel Tree URL'
         required: true
@@ -121,12 +109,7 @@ jobs:
             ${{ inputs.DEVICE_TREE_URL }} \
             workspace/${{ inputs.DEVICE_PATH }}
 
-      - name: Clone common tree
-        run: |
-          git clone --depth=1 \
-            -b ${{ inputs.COMMON_TREE_BRANCH }} \
-            ${{ inputs.COMMON_TREE_URL }} \
-            workspace/${{ inputs.COMMON_PATH }}
+      
 
       - name: Clone kernel tree
         run: |
