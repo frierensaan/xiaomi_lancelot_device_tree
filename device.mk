@@ -15,29 +15,9 @@ PRODUCT_AAPT_PREF_CONFIG := xxhdpi
 TARGET_SCREEN_WIDTH := 1080
 TARGET_SCREEN_HEIGHT := 2340
 
-# Fastbootd
-PRODUCT_PACKAGES += \
-    fastbootd
-
-# Health
-PRODUCT_PACKAGES += \
-    android.hardware.health@2.1-impl \
-    android.hardware.health@2.1-impl.recovery \
-    android.hardware.health@2.1-service
-
-# Init scripts
-PRODUCT_PACKAGES += \
-    fstab.mt6768 \
-    fstab.mt6768.ramdisk \
-    init.recovery.mt6768.rc \
-    init.mt6768.rc \
-    init.mt6768.usb.rc
-
 # Soong
 PRODUCT_SOONG_NAMESPACES += \
-    $(LOCAL_PATH) \
-    hardware/mediatek \
-    hardware/xiaomi
+    $(LOCAL_PATH)
 
 # Shipping API Level
 PRODUCT_SHIPPING_API_LEVEL := 29
