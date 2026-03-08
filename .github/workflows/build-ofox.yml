@@ -38,7 +38,7 @@ on:
       KERNEL_TREE_BRANCH:
         description: 'Kernel Tree Branch'
         required: true
-        default: 'main'
+        default: 'lineage-21'
       DEVICE_NAME:
         description: 'Device Codename'
         required: true
