@@ -1,1 +1,5 @@
-adb pull /system/etc/task_profiles.json
+{
+  "Version": 1,
+  "Profiles": [],
+  "AggregateProfiles": []
+}
