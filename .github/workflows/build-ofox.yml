@@ -70,19 +70,20 @@ jobs:
 
       - name: Setup ccache
         run: |
-          ccache --max-size=10G
-          echo "USE_CCACHE=1" >> $GITHUB_ENV
-          echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
-
-      - name: Setup ccache
-        run: |
           sudo mkdir -p /mnt/ccache
-          sudo chmod 777 /mnt/ccache
+          sudo chown runner:runner /mnt/ccache
+          sudo chmod 755 /mnt/ccache
           ccache --max-size=10G
           echo "USE_CCACHE=1" >> $GITHUB_ENV
           echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
           echo "CCACHE_DIR=/mnt/ccache" >> $GITHUB_ENV
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: /mnt/ccache
+          key: ccache-ofox-lancelot-${{ github.sha }}
+          restore-keys: ccache-ofox-lancelot-
 
       - name: Install repo tool
         run: |
@@ -129,6 +130,7 @@ jobs:
           export FOX_BUILD_DEVICE=${{ inputs.DEVICE_NAME }}
           export USE_CCACHE=1
           export CCACHE_EXEC=$(which ccache)
+          export CCACHE_DIR=/mnt/ccache
           export LC_ALL=C
           set -e
           lunch ${{ inputs.MAKEFILE_NAME }}-eng && mka adbd ${{ inputs.BUILD_TARGET }} -j$(nproc --all) 2>&1 | tee build.log
