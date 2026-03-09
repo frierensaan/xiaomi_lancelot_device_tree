@@ -82,7 +82,7 @@ TARGET_BOOTLOADER_BOARD_NAME := mt6768
 # Security patch
 PLATFORM_SECURITY_PATCH := 2099-12-31
 VENDOR_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 16.1.0
+PLATFORM_VERSION := 99.87.36
 
 # Recovery fstab
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
@@ -93,37 +93,6 @@ TW_INCLUDE_CRYPTO_FBE := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
 TW_USE_FSCRYPT_POLICY := 2
 TW_FORCE_KEYMASTER_VER := true
-
-# Beanpod TEE + KeyMint libs
-TARGET_RECOVERY_DEVICE_MODULES += \
-    android.hardware.keymaster@3.0 \
-    android.hardware.keymaster@4.0 \
-    android.hardware.security.keymint-V1-ndk \
-    libkeymaster4 \
-    libkeymaster4support \
-    libkeymaster_messages \
-    libkeymaster_portable \
-    libpuresoftkeymasterdevice \
-    libshim_beanpod \
-    vendor.mediatek.hardware.keymaster_attestation@1.0 \
-    vendor.mediatek.hardware.keymaster_attestation@1.1 \
-    vendor.microtrust.hardware.soter@1.0
-TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster4.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster4support.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster_messages.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster_portable.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libpuresoftkeymasterdevice.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/android.hardware.keymaster@3.0.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/android.hardware.keymaster@4.0.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/android.hardware.security.keymint-V1-ndk.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libshim_beanpod.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/vendor.mediatek.hardware.keymaster_attestation@1.0.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/vendor.mediatek.hardware.keymaster_attestation@1.1.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/vendor.microtrust.hardware.soter@1.0.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/hw/kmsetkey.beanpod.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/hw/gatekeeper.beanpod.so \
-    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so
 
 # TWRP UI
 TW_THEME := portrait_hdpi
@@ -153,12 +122,7 @@ TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_Y_OFFSET := 80
 TW_H_OFFSET := -80
 TW_SKIP_COMPATIBILITY_CHECK := true
-OF_SCREEN_H := 2340
-OF_STATUS_H := 80
 
 # Selinux
 SEPOLICY_IGNORE_NEVERALLOWS := true
 SELINUX_IGNORE_NEVERALLOWS := true
-
-
-
