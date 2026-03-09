@@ -88,31 +88,33 @@ jobs:
 
       - name: Sync OrangeFox source
         run: |
-          mkdir workspace
+          mkdir -p ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}
           git clone https://gitlab.com/OrangeFox/sync.git ofox_sync
           cd ofox_sync
-          bash orangefox_sync.sh --branch ${{ inputs.MANIFEST_BRANCH }} --path $(pwd)/../workspace
+          bash orangefox_sync.sh --branch ${{ inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}
           cd ..
           rm -rf ofox_sync
 
       - name: Clone device tree
         run: |
+          cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}
           git clone --depth=1 \
             -b ${{ inputs.DEVICE_TREE_BRANCH }} \
             ${{ inputs.DEVICE_TREE_URL }} \
-            workspace/${{ inputs.DEVICE_PATH }}
+            ./${{ inputs.DEVICE_PATH }}
 
       - name: Clone kernel tree
         run: |
+          cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}
           git clone --depth=1 \
             -b ${{ inputs.KERNEL_TREE_BRANCH }} \
             ${{ inputs.KERNEL_TREE_URL }} \
-            workspace/kernel/xiaomi/mt6768
+            ./kernel/xiaomi/mt6768
 
       - name: Build OrangeFox
         shell: bash
         run: |
-          cd workspace
+          cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}
           set +e
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
@@ -121,18 +123,18 @@ jobs:
           export CCACHE_EXEC=$(which ccache)
           export LC_ALL=C
           set -e
-          lunch ${{ inputs.MAKEFILE_NAME }}-eng && mka adbd ${{ inputs.BUILD_TARGET }} -j$(nproc --all) 2>&1 | tee build.log
+          lunch ${{ inputs.MAKEFILE_NAME }}-eng && make clean && mka adbd ${{ inputs.BUILD_TARGET }} -j$(nproc --all) 2>&1 | tee build.log
           exit ${PIPESTATUS[0]}
 
       - name: Check build output
         run: |
-          OUT="workspace/out/target/product/${{ inputs.DEVICE_NAME }}"
+          OUT="${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}"
           if ls $OUT/OrangeFox*.zip 2>/dev/null || ls $OUT/recovery.img 2>/dev/null; then
             echo "BUILD_SUCCESS=true" >> $GITHUB_ENV
           else
             echo "BUILD_SUCCESS=false" >> $GITHUB_ENV
             echo "Build failed! Last 200 lines of log:"
-            tail -200 workspace/build.log
+            tail -200 ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/build.log
             exit 1
           fi
 
@@ -141,8 +143,8 @@ jobs:
         with:
           name: OrangeFox-lancelot-${{ github.run_id }}
           path: |
-            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/OrangeFox*.zip
-            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/recovery.img
+            ${{ github.workspace }}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}/OrangeFox*.zip
+            ${{ github.workspace }}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}/recovery.img
           retention-days: 7
 
       - name: Upload build log on failure
@@ -150,7 +152,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-log-${{ github.run_id }}
-          path: workspace/build.log
+          path: ${{ github.workspace }}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/build.log
           retention-days: 3
 
       - name: Create Release
@@ -168,7 +170,7 @@ jobs:
 
             > ⚠️ Unofficial build — flash at your own risk.
           files: |
-            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/OrangeFox*.zip
-            workspace/out/target/product/${{ inputs.DEVICE_NAME }}/recovery.img
+            ${{ github.workspace }}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}/OrangeFox*.zip
+            ${{ github.workspace }}/OrangeFox/fox_${{ inputs.MANIFEST_BRANCH }}/out/target/product/${{ inputs.DEVICE_NAME }}/recovery.img
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
