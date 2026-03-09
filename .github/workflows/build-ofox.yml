@@ -75,12 +75,14 @@ jobs:
           echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
           echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
 
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: ccache-ofox-lancelot-${{ github.sha }}
-          restore-keys: ccache-ofox-lancelot-
+      - name: Setup ccache
+        run: |
+          sudo mkdir -p /mnt/ccache
+          sudo chmod 777 /mnt/ccache
+          ccache --max-size=10G
+          echo "USE_CCACHE=1" >> $GITHUB_ENV
+          echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
+          echo "CCACHE_DIR=/mnt/ccache" >> $GITHUB_ENV
 
       - name: Install repo tool
         run: |
