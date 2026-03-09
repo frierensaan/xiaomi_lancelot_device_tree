@@ -70,10 +70,10 @@ jobs:
 
       - name: Setup ccache
         run: |
-          mkdir -p ~/.cache/ccache
+          sudo apt-get install -y ccache
           echo "USE_CCACHE=1" >> $GITHUB_ENV
           echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$HOME/.cache/ccache" >> $GITHUB_ENV
+          echo "CCACHE_DIR=/tmp/ccache" >> $GITHUB_ENV
           ccache -M 10G
 
       - name: Cache ccache
@@ -130,7 +130,7 @@ jobs:
           export FOX_BUILD_DEVICE=${{ inputs.DEVICE_NAME }}
           export USE_CCACHE=1
           export CCACHE_EXEC=$(which ccache)
-          export CCACHE_DIR=$HOME/.cache/ccache
+          export CCACHE_DIR=/tmp/ccache
           export LC_ALL=C
           set -e
           lunch ${{ inputs.MAKEFILE_NAME }}-eng && make clean && mka adbd ${{ inputs.BUILD_TARGET }} -j$(nproc --all) 2>&1 | tee build.log
