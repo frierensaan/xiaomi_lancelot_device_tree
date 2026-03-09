@@ -69,10 +69,19 @@ jobs:
             python3 python-is-python3
 
       - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1.2
+        run: |
+          mkdir -p ~/.cache/ccache
+          echo "USE_CCACHE=1" >> $GITHUB_ENV
+          echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$HOME/.cache/ccache" >> $GITHUB_ENV
+          ccache -M 10G
+
+      - name: Cache ccache
+        uses: actions/cache@v4
         with:
-          max-size: 10G
-          key: ccache-ofox-lancelot
+          path: ~/.cache/ccache
+          key: ccache-ofox-lancelot-${{ github.sha }}
+          restore-keys: ccache-ofox-lancelot-
 
       - name: Install repo tool
         run: |
