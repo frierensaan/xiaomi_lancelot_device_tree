@@ -69,12 +69,10 @@ jobs:
             python3 python-is-python3
 
       - name: Setup ccache
-        run: |
-          sudo apt-get install -y ccache
-          echo "USE_CCACHE=1" >> $GITHUB_ENV
-          echo "CCACHE_EXEC=$(which ccache)" >> $GITHUB_ENV
-          echo "CCACHE_DIR=/tmp/ccache" >> $GITHUB_ENV
-          ccache -M 10G
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          max-size: 10G
+          key: ccache-ofox-lancelot
 
       - name: Cache ccache
         uses: actions/cache@v4
