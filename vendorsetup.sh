@@ -2,7 +2,7 @@
 
 # OrangeFox Build Variables for Xiaomi Redmi 9 (lancelot)
 export OF_MAINTAINER="frieren"
-export FOX_VERSION="R11.1"
+export FOX_MAINTAINER_PATCH_VERSION="1"
 export FOX_BUILD_TYPE="Unofficial"
 
 # Crypto/Decryption (Diagnostic bypass to isolate UI hangs)
