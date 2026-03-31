@@ -10,4 +10,5 @@ export OF_STATUS_H=80
 export OF_NO_ADDITIONAL_MIUI_PROPS_CHECK=1
 export TARGET_DEVICE_ALT="shiva"
 export FOX_TARGET_DEVICES="lancelot,shiva"
+export OF_SKIP_FBE_DECRYPTION=1
 
