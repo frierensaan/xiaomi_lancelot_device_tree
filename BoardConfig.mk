@@ -78,10 +78,10 @@ BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 TARGET_BOARD_PLATFORM := mt6768
 TARGET_BOOTLOADER_BOARD_NAME := mt6768
 
-# Security patch - use far future date to prevent anti-rollback issues
-PLATFORM_SECURITY_PATCH := 2099-12-31
-VENDOR_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 99.87.36
+# Security patch - Must match the ROM for Keymaster to decrypt!
+PLATFORM_VERSION := 14
+PLATFORM_SECURITY_PATCH := 2024-03-05
+VENDOR_SECURITY_PATCH := 2024-03-05
 
 # Recovery fstab
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
@@ -90,7 +90,9 @@ TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
-TW_USE_FSCRYPT_POLICY := 2
+TW_USE_FSCRYPT_POLICY := 1
+TW_FORCE_KEYMASTER_VER := false
+TW_PREPARE_DATA_MEDIA_EARLY := true
 
 # TWRP UI
 TW_THEME := portrait_hdpi
@@ -121,7 +123,7 @@ TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_Y_OFFSET := 80
 TW_H_OFFSET := -80
 TW_SKIP_COMPATIBILITY_CHECK := true
-TW_CUSTOM_BATTERY_PATH := "/sys/class/power_supply/Battery"
+TW_CUSTOM_BATTERY_PATH := /sys/devices/platform/battery/power_supply/battery
 
 # Selinux
 SEPOLICY_IGNORE_NEVERALLOWS := true
