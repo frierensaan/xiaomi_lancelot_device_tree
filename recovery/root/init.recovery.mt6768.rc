@@ -48,6 +48,9 @@ on post-fs
     chown system system /dev/utr_tui
 
 on property:hwservicemanager.ready=true
+    # Rescue: Force mount logical vendor partition read-only to guarantee binaries exist
+    mount ext4 /dev/block/mapper/vendor /vendor ro
+    
     start teei_daemon
     start vendor.keymaster-4-0-beanpod
     start gatekeeper-1-0
