@@ -7,8 +7,7 @@ export FOX_BUILD_TYPE="Unofficial"
 
 export OF_DEFAULT_TIMEZONE="Asia/Kolkata"
 
-# Crypto/Decryption (Diagnostic bypass to isolate UI hangs)
-export OF_SKIP_FBE_DECRYPTION=1
+export OF_DEFAULT_KEYMASTER_VERSION=4
 
 # Screen Settings (Lancelot specific)
 export OF_SCREEN_H=2340
