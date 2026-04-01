@@ -122,6 +122,7 @@ TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_Y_OFFSET := 80
 TW_H_OFFSET := -80
 TW_SKIP_COMPATIBILITY_CHECK := true
+TW_CUSTOM_BATTERY_PATH := "/sys/class/power_supply/battery"
 
 # Selinux
 SEPOLICY_IGNORE_NEVERALLOWS := true
