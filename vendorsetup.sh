@@ -5,6 +5,8 @@ export OF_MAINTAINER="frieren"
 export FOX_MAINTAINER_PATCH_VERSION="1"
 export FOX_BUILD_TYPE="Unofficial"
 
+export OF_DEFAULT_TIMEZONE="Asia/Kolkata"
+
 # Crypto/Decryption (Diagnostic bypass to isolate UI hangs)
 export OF_SKIP_FBE_DECRYPTION=1
 
