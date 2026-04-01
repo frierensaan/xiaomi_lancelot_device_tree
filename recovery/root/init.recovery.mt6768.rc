@@ -1,22 +1,69 @@
 on init
     setprop sys.usb.ffs.aio_compat 1
     setprop sys.usb.configfs 1
-    # Set the MT6768 UDC controller name
-    setprop sys.usb.controller musb-hdrc
 
 on property:ro.debuggable=1
     setprop sys.usb.config adb
 
 on property:sys.usb.config=adb
-    write /config/usb_gadget/g1/configs/c.1/strings/0x409/configuration "adb"
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
     write /config/usb_gadget/g1/functions/ffs.adb/os_desc/interface.MTP/compatible_id ""
     write /config/usb_gadget/g1/functions/ffs.adb/os_desc/interface.MTP/sub_compatible_id ""
-    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/c.1/ffs.adb
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/ffs.adb
     start adbd
+
+on property:sys.usb.config=fastboot
+    start fastbootd
 
 on property:sys.usb.ffs.ready=1 && property:sys.usb.config=adb
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
+
+# Decryption services
+service teei_daemon /vendor/bin/teei_daemon
+    class main
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service keymaster-4-0 /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
+    user root
+    group root drmrpc
+    disabled
+    seclabel u:r:recovery:s0
+
+service gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+on property:hwservicemanager.ready=true
+    start teei_daemon
+    start keymaster-4-0
+    start gatekeeper-1-0
+
+on property:ro.crypto.state=unsupported
+    stop teei_daemon
+    stop keymaster-4-0
+    stop gatekeeper-1-0
+    stop servicemanager
+    stop hwservicemanager
+
+on property:ro.crypto.state=unencrypted
+    stop teei_daemon
+    stop keymaster-4-0
+    stop gatekeeper-1-0
+    stop servicemanager
+    stop hwservicemanager
+
+on property:twrp.decrypt.done=true
+    stop teei_daemon
+    stop keymaster-4-0
+    stop gatekeeper-1-0
+    stop servicemanager
+    stop hwservicemanager
 
 service adbd /system/bin/adbd --root_seclabel=u:r:su:s0
     class core
