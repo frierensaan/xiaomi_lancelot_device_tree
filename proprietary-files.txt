@@ -322,3 +322,5 @@ vendor/thh/ta/9073f03a9618383bb1856eb3f990babd.ta
 vendor/thh/ta/98fb95bcb4bf42d26473eae48690d7ea.ta
 vendor/thh/ta/e97c270ea5c44c58bcd3384a2fa2539e.ta
 vendor/etc/vintf/manifest.xml
+
+recovery/root/etc/recovery.fstab
